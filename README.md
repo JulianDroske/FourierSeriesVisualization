@@ -5,6 +5,10 @@ Thanks to 3Blue1Brown.
 
 and his formula
 
+here's the link: https://www.bilibili.com/video/BV1vt411N7Ti
+
+***
+
 ### This project is splited into 3 versions:
 for WebBrowser (Chrome), at browser/
 
