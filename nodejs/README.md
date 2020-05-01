@@ -2,11 +2,13 @@
 ## Mainline, the fastest speed version of this program
 
 ***
+### dependences: FFMPEG, nodejs
+***
 ## Usage: ./fsv [parameters] |[ffmpegcmd]
 
-Windows users: use ./fsv.cmd
+Windows users : use ./fsv.cmd
 
-Linux users: use ./fsv.sh
+Linux users : use ./fsv.sh
 
 for [parameters], you can run
 ```
