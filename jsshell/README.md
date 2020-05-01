@@ -12,6 +12,9 @@ Since this version is not mainline; it has a bug that it cannot parse those path
 ## This version can be very slow when running. Check Node.js version for faster speed.
 
 ***
+### dependences: FFMPEG, jsshell, lua(not necessary)
+
+***
 
 ## Usage: js -f canvas.js f.js |[bmpstrcmd] |[ffmpegcmd]
 
