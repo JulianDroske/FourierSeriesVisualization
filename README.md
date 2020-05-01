@@ -1,6 +1,10 @@
 # FourierSeriesVisualization
-A FourierSeriesVisualization Program to draw svg image using js requiring ffmpeg
+A FourierSeriesVisualization Program to draw svg image using js based on pipe requir. ffmpeg
 
+***
+### dependences: FFMPEG , js engine
+based on : pipe, BMP
+***
 Thanks to 3Blue1Brown.
 
 and his formula
