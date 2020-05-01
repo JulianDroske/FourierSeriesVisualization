@@ -1,0 +1,254 @@
+<html>
+	<head>
+		<script type="text/javascript" src="f.ff.js"></script>
+	</head>
+	<body style="background: white; padding: 0px; margin: 0px; overflow: hidden;">
+		<table style="width: 100%; height: 100%;">
+			<tr style="height: 0px;">
+				<td>
+					Load SVG File:<input id="FILE" type="file" onchange="svgc(files)" /><div id="MSG"></div>
+				</td>
+			</tr>
+			<tr>
+				<td rowspan="6">
+					<canvas style="width: 100%; height: 100%;">Canvas Unsupported.</canvas><br />
+					<div id="SVG" style="visibility: hidden; height: 0px; width: 0px;"></div>
+				</td>
+				<td>
+					<a style="color: grey;">Sampling:</a> HIGH<input type="range" min="0.0005" max="0.01" step="0.0005" value="0.005" onchange="onSamp(value)" />LOW
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<a style="color: grey;">Zoom:</a> MIN<input type="range" min="0.01" max="10" step="0.01" value="1" onchange="onZoom(value)" />MAX
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<a style="color: grey;">Drawing Speed:</a> SLOW<input type="range" min="0" max="100" step="1" value="90" onchange="onSpeed(value)" />FAST
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<a style="color: grey;">Drawing Sampling:</a> HIGH<input type="range" min="0.0001" max="0.01" step="0.0001" value="0.001" onchange="onDsamp(value)" />LOW
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<a style="color: grey;">Vectors Count:</a> MIN<input type="range" min="10" max="500" step="1" value="100" onchange="onV(value)" />MAX
+				</td>
+			</tr>
+			<tr></tr>
+		</table>
+		
+	</body>
+	
+	
+	<script>
+	var MSG;
+
+function C(a,b){
+	// MUST BE INT,INT
+	
+	this.a = a || 0;
+	this.b = b || 0;
+	
+	this.plus = function(c){
+		if(c instanceof C) return new C(this.a + c.a, this.b + c.b);
+		else return new C(this.a + c, this.b);
+	}
+	
+	this.minus = function(c){
+		if(c instanceof C) return new C(this.a - c.a, this.b - c.b);
+		else return new C(this.a - c, this.b);
+	}
+	
+	this.time = function(c){
+		if(c instanceof C) return new C(this.a * c.a - this.b * c.b, this.a * c.b + this.b * c.a);
+		else return new C(this.a * c, this.b * c);
+	}
+	
+	this.div = function(c){
+		if(c instanceof C) return;
+		return new C(this.a / c, this.b / c);
+	}
+	
+	this.getPoint = function(){
+		return [a,b];
+	}
+	
+}
+
+function V(c,s){
+	// saved PI
+	// c*e^{s*PI*i}
+	
+	this.c = c || 1;
+	this.s = s || 0;
+	
+	this.time = function(c){
+		if(c instanceof V) return new V(c.c.time(this.c), c.s.plus(this.s));
+		else if(c instanceof C) return new V(c.time(this.c), this.s);
+		else{
+			try{
+				return new V(this.c.time(c), this.s);
+			}catch(e){
+				return new V(this.c * c,this.s);
+			}
+		}
+	}
+	
+	this.toC = function(){
+		try{
+			return new C(Math.cos(s.time(Math.PI)), Math.sin(s.time(Math.PI))).time(c);
+		}catch(e){
+			return new C(Math.cos(s * Math.PI), Math.sin(s * Math.PI)).time(c);
+		}
+	}
+	
+	this.getPoint = function(t){
+		// 0 < t < 1
+		return new C(Math.cos(s*Math.PI * t), Math.sin(s*Math.PI * t)).time(c).getPoint();
+	}
+}
+
+
+
+var SVG = {
+	path: null,
+	length: null,
+	
+	init: function(svg){
+		SVG.path = svg.getElementsByTagName('path')[0];
+		SVG.length = SVG.path.getTotalLength();
+	},
+	
+	f: function(t){
+		var p = SVG.path.getPointAtLength(SVG.length*t);
+		return new C(p.x, p.y);
+	}
+}
+
+
+
+var fo=0;
+var samp = 0.005;
+var damp = 0.001;
+var sp=10;
+var vN = 100;
+var vZ = 1;
+var Onload = function(){
+	if(!SVG.path) return;
+	clearInterval(fo);
+	var canvas = document.getElementsByTagName('canvas')[0];
+	var width = canvas.clientWidth;
+	var height = canvas.clientHeight;
+	
+	canvas.width = width * window.devicePixelRatio;
+	canvas.height = height * window.devicePixelRatio;
+
+	var context = canvas.getContext('2d');
+	
+	
+	console.log('calc vectors....')
+	
+	var vectors = [];
+	var f = [];
+	for(var i=0; i<=1; i+=samp){
+		f.push(SVG.f(i).time(samp));
+	}
+	
+	for(var i=0, v=0.5;i<vN;++i,v+=0.5){
+		var c_n = new C();
+		// sum
+		for(var k=0,j=0; j<=1; k++,j+=samp){
+			c_n = c_n.plus(new V(f[k], -2 * (0|v)*Math.pow(-1,i) * j).toC());
+		}
+		vectors.push(new V(c_n.time(vZ), 2* (0|v)*Math.pow(-1,i)));
+		// console.log(c_n.a + ';' + c_n.b);
+	}
+	f = [];
+	
+	console.log('drawing...')
+	
+	MSG.innerHTML = '';
+	
+	// draw
+	var t = -damp*2;
+	var tmPath = [];
+	var savePath = true;
+	fo = setInterval(function(){
+		context.clearRect(0,0,width,height);
+		context.beginPath();
+		context.strokeStyle = 'black';
+		var cx=0, cy=0;
+		context.moveTo(cx,cy);
+		t += damp;
+		for(var i=0; i<vN; ++i){
+			var vector = vectors[i].getPoint(t);
+			// console.log(vector);
+			if(i==0) context.moveTo(cx += vector[0], cy += vector[1]);
+			else context.lineTo(cx += vector[0], cy += vector[1]);
+		}
+		context.stroke();
+		
+		context.beginPath();
+		var gb = 0.0;
+		context.strokeStyle = 'rgb(255,0,0)';
+		if(t <= 1) tmPath.push([cx,cy]);
+		tmPath.forEach(function(p){
+			context.lineTo(p[0], p[1]);
+		});
+		context.stroke();
+	},sp);
+	
+}
+
+var svgc= function(files){
+	if(files.length){
+		var file = files[0];
+		var reader = new FileReader();
+		reader.onloadend = function(e){
+			MSG.innerHTML = 'Loading...';
+			setTimeout(function(){
+				var SVGDOM = document.getElementById('SVG');
+				SVGDOM.innerHTML = e.target.result;
+				SVG.init(SVGDOM);
+				Onload();
+			},100);
+		};
+		reader.readAsText(file);
+	}
+}
+
+window.onload = function(){
+	MSG = document.getElementById('MSG');
+}
+
+var onSamp = function(value){
+	samp = parseFloat(value);
+	Onload();
+}
+
+var onZoom = function(value){
+	vZ = parseFloat(value);
+	Onload();
+}
+
+var onDsamp = function(value){
+	damp = parseFloat(value);
+	Onload();
+}
+
+var onSpeed = function(value){
+	sp = 100-parseInt(value);
+	Onload();
+}
+
+var onV = function(value){
+	vN = parseInt(value);
+	Onload();
+}
+
+</script>
+</html>
