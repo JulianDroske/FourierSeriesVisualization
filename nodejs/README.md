@@ -4,7 +4,7 @@
 ***
 ### dependences: FFMPEG, nodejs
 ***
-## Usage: ./fsv [parameters] |[ffmpegcmd]
+## Usage: ./fsv [parameters]
 
 Windows users : use ./fsv.cmd
 
@@ -15,6 +15,8 @@ for [parameters], you can run
 ./fsv help
 ```
 for more details.
+
+## Or: node ./fsv.js [parameters] | [ffmpegcmd]
 
 ### [ffmpegcmd] can be:
 ```
