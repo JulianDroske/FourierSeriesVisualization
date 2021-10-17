@@ -1,5 +1,5 @@
 # FourierSeriesVisualization
-A FourierSeriesVisualization Program to draw svg image using js based on pipe requir. ffmpeg
+Visualization of Fourier Series inspired by 3Blue1Brown to draw svg image using javascript, based on pipe, ffmpeg required.
 
 ***
 ### dependences: FFMPEG , js engine
@@ -20,15 +20,15 @@ for jsshell (Mozilla), at jsshell/
 
 for Node.js [mainline], at nodejs/
 
-Since binary files are not allowed to upload, these files are ignored (ffmpeg&lua&jsshell&nodejs binaries)
+Binary files are not allowed to upload, so these files are ignored (ffmpeg&lua&jsshell&nodejs binaries)
 ***
-jump into these folders for more details
+Enter these folders for more details
 ***
-# Format of the output when run js only:
+# Format of the output while running js only:
 [frame1][frame2][frame3]...
 
 each frame has a header of BMP.
 
-so if you save a frame to file, that file is a BMP image.
+If you dump one frame to a file, that will be a BMP image.
 
 
