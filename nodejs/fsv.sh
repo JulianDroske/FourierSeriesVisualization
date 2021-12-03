@@ -1,3 +1,3 @@
 #!/bin/sh
 PTH="$(dirname ${0})"
-node "$PTH/fsv.js" $@ | ffplay -loop 1 -i pipe:
+"$PTH/node.exe" "$PTH/fsv.js" "$@" | "$PTH/ffplay.exe" -loop 1 -i pipe:
