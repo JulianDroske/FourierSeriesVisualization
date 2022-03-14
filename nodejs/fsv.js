@@ -20,6 +20,7 @@ var scale = 1;
 var offX = 0, offY = 0;
 var camfollow=true;
 var COLORS = {vect: -1, stro: 4278255615, bg: 0};
+var outputFile = undefined;
 
 function C2I(r,g,b){
 	r = parseInt(r || 255);
@@ -108,6 +109,9 @@ for(var i=2;i<process.argv.length;++i){
 			content = content.substring(content.indexOf(' d="')+4,content.length);
 			pathDat = content.substring(0,content.indexOf('"'));
 			break;
+		case 'out':
+			outputFile = argvl;
+			break;
 		case 'help':
 			process.stderr.write("\
 Fourier Series Visualization\n\
@@ -131,7 +135,8 @@ Options:\n\
 \tcolor.vect=r,g,b\t\tColor of Vectors\n\
 \tcolor.str=r,g,b\t\t\tColor of Stroke\n\
 \tcolor.bg=r,g,b\t\t\tColor of Background\n\
-			");
+\tout=string\t\t\tVideo File to output to\n\
+			\n");
 			process.exit(0);
 	}
 	if(starT >= endT){
@@ -1071,5 +1076,8 @@ while(t<=endT){
 	}
 	t += dsmp;
 
-	canvas.stroke();canvas.outputMPEG(true);
+	canvas.stroke();canvas.outputMPEG(false, outputFile);
 }
+// TODO: fixme: write() is not sync
+// canvas.endMPEG();
+console.log('render complete');
