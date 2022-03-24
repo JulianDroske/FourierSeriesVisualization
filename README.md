@@ -2,7 +2,7 @@
 Visualization of Fourier Series inspired by 3Blue1Brown to draw svg image using javascript, based on pipe, ffmpeg required.
 
 ***
-### dependences: FFMPEG , js engine
+### dependencies: FFMPEG , js engine
 based on : pipe, BMP
 ***
 Thanks to 3Blue1Brown.
